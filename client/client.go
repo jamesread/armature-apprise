@@ -69,8 +69,8 @@ type logResponse struct {
 type statusHandler func([]byte) error
 
 var statusHandlers = map[int]statusHandler{
-	http.StatusOK:                          func(body []byte) error { return jsonErrorField(body) },
-	http.StatusNoContent:                   func([]byte) error { return errNoTargetsMatched() },
+	http.StatusOK:                          jsonErrorField,
+	http.StatusNoContent:                   statusNoContent,
 	http.StatusFailedDependency:            func(body []byte) error { return appriseErrorFromBody(body, "one or more notifications could not be sent") },
 	http.StatusBadRequest:                  func(body []byte) error { return appriseErrorFromBody(body, "invalid notification request") },
 	http.StatusNotAcceptable:               func([]byte) error { return fmt.Errorf("apprise: recursion limit reached (HTTP 406)") },
@@ -220,7 +220,7 @@ func postOnce(cfg Config, httpClient *http.Client, notifyURL string, body []byte
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, readErr := io.ReadAll(io.LimitReader(resp.Body, 64*1024))
 	if readErr != nil {
@@ -245,6 +245,10 @@ func statusError(statusCode int, respBody []byte) error {
 		return nil
 	}
 	return unexpectedStatusError(statusCode, respBody)
+}
+
+func statusNoContent([]byte) error {
+	return errNoTargetsMatched()
 }
 
 func errNoTargetsMatched() error {
@@ -273,12 +277,14 @@ func appriseErrorFromBody(respBody []byte, fallback string) error {
 }
 
 func parsedAppriseError(respBody []byte) error {
+	if len(respBody) == 0 {
+		return nil
+	}
 	var parsed logResponse
-	if len(respBody) == 0 || json.Unmarshal(respBody, &parsed) != nil {
-		return nil
+	if err := json.Unmarshal(respBody, &parsed); err == nil {
+		if parsed.Error != nil && strings.TrimSpace(*parsed.Error) != "" {
+			return fmt.Errorf("apprise: %s", strings.TrimSpace(*parsed.Error))
+		}
 	}
-	if parsed.Error == nil || strings.TrimSpace(*parsed.Error) == "" {
-		return nil
-	}
-	return fmt.Errorf("apprise: %s", strings.TrimSpace(*parsed.Error))
+	return nil
 }
