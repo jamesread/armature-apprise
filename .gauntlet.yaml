@@ -1,0 +1,8 @@
+# armature-apprise is a Go library (client/tag/template packages), not a deployable
+# SOA service. The baseline layout rules assume a service/ tree and structured logging.
+apiVersion: gauntlet/v1
+waivers:
+  - rule: jwr-soa-baseline/layout-service-dir
+    reason: Library module with public packages at repo root (client, tag, template); no service binary.
+  - rule: jwr-soa-baseline/go-uses-logrus
+    reason: Thin HTTP client library; no service process and no structured logging dependency.

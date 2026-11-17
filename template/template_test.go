@@ -12,6 +12,6 @@ func TestRender(t *testing.T) {
 		"stars": "5",
 	})
 	assert.Equal(t, "Hello Alex (5)", out)
-	assert.Equal(t, "", Render("", map[string]string{"name": "x"}))
+	assert.Empty(t, Render("", map[string]string{"name": "x"}))
 	assert.Equal(t, "keep {{unknown}}", Render("keep {{unknown}}", map[string]string{"name": "x"}))
 }

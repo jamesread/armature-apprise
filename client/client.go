@@ -174,7 +174,7 @@ func normalizePayload(payload Payload) Payload {
 func notifyWithRetries(cfg Config, httpClient *http.Client, notifyURL string, body []byte) error {
 	maxRetries, retryDelay := retrySettings(cfg)
 	var lastErr error
-	for attempt := 0; attempt < maxRetries; attempt++ {
+	for attempt := range maxRetries {
 		sleepBeforeRetry(attempt, retryDelay)
 		if err := postOnce(cfg, httpClient, notifyURL, body); err == nil {
 			return nil

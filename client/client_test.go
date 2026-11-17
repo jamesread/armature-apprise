@@ -32,7 +32,7 @@ func TestNotify_PostsJSONPayloadWithTag(t *testing.T) {
 		gotContentType = r.Header.Get("Content-Type")
 		gotAccept = r.Header.Get("Accept")
 		gotUserAgent = r.Header.Get("User-Agent")
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&gotBody))
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&gotBody))
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"error":null,"details":[]}`))
 	}))
@@ -60,7 +60,7 @@ func TestNotify_PostsJSONPayloadWithTag(t *testing.T) {
 func TestNotify_DefaultsTypeToInfo(t *testing.T) {
 	var gotBody Payload
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&gotBody))
+		assert.NoError(t, json.NewDecoder(r.Body).Decode(&gotBody))
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"error":null,"details":[]}`))
 	}))

@@ -1,4 +1,4 @@
-.PHONY: build test gocyclo golangci clean
+.PHONY: build test lint gocyclo golangci clean
 
 build:
 	@echo "Building armature-apprise..."
@@ -7,6 +7,8 @@ build:
 test:
 	@echo "Running unit tests..."
 	@go test -v ./...
+
+lint: gocyclo golangci
 
 gocyclo:
 	@echo "Running gocyclo..."

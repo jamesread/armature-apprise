@@ -3,7 +3,7 @@
 
   Apprise HTTP notification client and helpers for jwr SOA apps.
 
-  [![Maturity Badge](https://img.shields.io/badge/maturity-alpha-red.svg)](#none)
+  [![Maturity Badge](https://img.shields.io/badge/maturity-production-green.svg)](#none)
 
 </div>
 
